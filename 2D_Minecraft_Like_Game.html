@@ -1,0 +1,26 @@
+
+<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><title>2D Craft</title>
+<style>body{margin:0;background:#87ceeb;overflow:hidden}canvas{display:block;margin:auto;background:#87ceeb}</style>
+</head><body><canvas id=c width=800 height=480></canvas>
+<script>
+const cv=c,ctx=cv.getContext('2d');const T=32,W=25,H=15;
+let map=[];for(let y=0;y<H;y++){map[y]=[];for(let x=0;x<W;x++){map[y][x]=y>10?1:(y==10?2:0);}}
+for(let x=5;x<8;x++)map[9][x]=3;
+let p={x:100,y:0,vx:0,vy:0};
+onkeydown=e=>keys[e.key]=1;onkeyup=e=>keys[e.key]=0;let keys={};
+cv.oncontextmenu=e=>e.preventDefault();
+cv.onmousedown=e=>{let r=cv.getBoundingClientRect(),mx=Math.floor((e.clientX-r.left)/T),my=Math.floor((e.clientY-r.top)/T);if(mx>=0&&mx<W&&my>=0&&my<H){map[my][mx]=e.button==0?0:1;}};
+function solid(px,py){let tx=Math.floor(px/T),ty=Math.floor(py/T);return map[ty]&&map[ty][tx]>0;}
+function loop(){
+p.vx=(keys["ArrowRight"]?3:0)-(keys["ArrowLeft"]?3:0);
+if(keys["ArrowUp"]&&solid(p.x+16,p.y+33)){p.vy=-8;}
+p.vy+=0.4;
+let nx=p.x+p.vx,ny=p.y+p.vy;
+if(!solid(nx+16,p.y+32))p.x=nx;
+if(!solid(p.x+16,ny+32))p.y=ny;else{if(p.vy>0)p.y=Math.floor((p.y+32)/32)*32-32;p.vy=0;}
+ctx.clearRect(0,0,800,480);
+for(let y=0;y<H;y++)for(let x=0;x<W;x++){let b=map[y][x];if(!b)continue;ctx.fillStyle=b==1?"#8B5A2B":b==2?"#3CB043":"#6B4F2A";ctx.fillRect(x*T,y*T,T,T);}
+ctx.fillStyle="red";ctx.fillRect(p.x,p.y,24,32);
+requestAnimationFrame(loop);}
+loop();
+</script></body></html>
